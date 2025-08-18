@@ -11,6 +11,15 @@
        FILE SECTION.
 
        WORKING-STORAGE SECTION.
+       01 WS-COMPLETE PIC X VALUE "N".
+       01 LOGIN-COMPONENT.
+        05 AUTH-KEY PIC X VALUE "N".
+        05 USERNAME-BASE PIC X(20) VALUE "kasidit".
+        05 PASSWORD-BASE PIC X(10) VALUE "000111".
+        05 USERNAME-INPUT PIC X(20).
+        05 PASSWORD-INPUT PIC X(10).
+
+       01 DISPLAY-STAR PIC X VALUE " ".
        01 WS-EXIT PIC X VALUE "N".
        01 WS-OPTION PIC 9 VALUE 0.
        01 WS-DUMMY PIC X.
@@ -101,8 +110,25 @@
                MOVE 12 TO PRODUCT-STOCK(10)
                MOVE 1800.25 TO PRODUCT-PRICE(10)
 
-               DISPLAY "ENTER DATE (YYYYMMDD): "
-               ACCEPT WS-DATE.
+               PERFORM UNTIL AUTH-KEY = "Y"
+                       DISPLAY "ENTER USERNAME :"
+                       ACCEPT USERNAME-INPUT
+
+                       DISPLAY "ENTER PASSWORD"
+                       ACCEPT PASSWORD-INPUT
+
+                       IF USERNAME-BASE = USERNAME-BASE AND
+                          PASSWORD-INPUT = PASSWORD-BASE
+                           MOVE "Y" TO AUTH-KEY
+                       ELSE
+                           DISPLAY
+                           "THIS IS NOT RIGHT USERNAME OR PASSWORD"
+                   END-IF
+
+                   END-PERFORM
+
+                   DISPLAY "ENTER DATE (YYYYMMDD): "
+                   ACCEPT WS-DATE
 
                EVALUATE WS-MONTH
                    WHEN 1  MOVE "JAN" TO WS-MONTH-ABBR
@@ -120,7 +146,11 @@
                END-EVALUATE.
 
 
+
                PERFORM UNTIL WS-EXIT = "Y"
+
+
+
                    DISPLAY "=== MAIN MENU ==="
                    DISPLAY "1. SELL ITEM"
                    DISPLAY "2. RESTOCK ITEM"
@@ -142,6 +172,7 @@
                            DISPLAY "EXITING PROGRAM. GOOD BYE!"
                        WHEN OTHER
                            DISPLAY "INVALID OPTION. TRY AGAIN."
+
                    END-EVALUATE
                END-PERFORM.
 
@@ -152,75 +183,96 @@
 
 
                DISPLAY "=== SELL ITEM MENU ===".
-               DISPLAY "ENTER PRODUCT-ID TO SELL: ".
-               ACCEPT WS-INPUT-PRODUCT-ID.
 
-               DISPLAY "ENTER QUANTITY TO SELL: ".
-               ACCEPT WS-INPUT-QUANTITY.
 
-               PERFORM VARYING WS-INDEX FROM 1 BY 1 UNTIL
-                   WS-INDEX > 100
-                   OR WS-FOUND = "Y"
-                   IF PRODUCT-ID(WS-INDEX) = WS-INPUT-PRODUCT-ID
-                       MOVE "Y" TO WS-FOUND
-                       IF PRODUCT-STOCK(WS-INDEX) >= WS-INPUT-QUANTITY
-                           SUBTRACT WS-INPUT-QUANTITY
-                               FROM PRODUCT-STOCK(WS-INDEX)
-                           MULTIPLY PRODUCT-PRICE(WS-INDEX) BY
-                               WS-INPUT-QUANTITY GIVING WS-TOTAL-PRICE
-                           DISPLAY "SALE SUCCESSFUL."
+           PERFORM UNTIL WS-COMPLETE = "Y"
 
-                           MOVE WS-TOTAL-PRICE TO DISPLAY-PRICE
+           DISPLAY "ENTER PRODUCT-ID TO SELL: "
+           ACCEPT WS-INPUT-PRODUCT-ID
 
-                           DISPLAY "TOTAL PRICE: " DISPLAY-PRICE
-                       ELSE
-                           DISPLAY "ERROR : NOT ENOUGH STOCK AVAILABLE:"
-                           PRODUCT-STOCK(WS-INDEX)
-                       END-IF
-                   END-IF
-               END-PERFORM.
+           DISPLAY "ENTER QUANTITY TO SELL: "
+           ACCEPT WS-INPUT-QUANTITY
 
-               IF WS-FOUND = "N"
-                   DISPLAY "ERROR : PRODUCT ID NOT FOUND."
-               END-IF.
+           MOVE "N" TO WS-FOUND
 
-               DISPLAY " "
-               DISPLAY "PRESS ENTER TO RETURN TO MAIN MENU..."
-               ACCEPT WS-DUMMY.
+                     PERFORM VARYING WS-INDEX FROM 1 BY 1 UNTIL
+               WS-INDEX > 100 OR WS-FOUND = "Y"
+               IF PRODUCT-ID(WS-INDEX) = WS-INPUT-PRODUCT-ID
+                   MOVE "Y" TO WS-FOUND
+               END-IF
+           END-PERFORM
 
-           RESTOCK-ITEM.
-               MOVE "N" TO WS-FOUND.
+                    IF WS-FOUND = "N"
+               DISPLAY "ERROR : PRODUCT ID NOT FOUND. PLEASE TRY AGAIN."
+           ELSE
+               SUBTRACT 1 FROM WS-INDEX
+               IF PRODUCT-STOCK(WS-INDEX) >= WS-INPUT-QUANTITY
+                SUBTRACT WS-INPUT-QUANTITY FROM PRODUCT-STOCK(WS-INDEX)
 
-               DISPLAY "=== RESTOCK ITEM MENU ===".
-               DISPLAY "ENTER PRODUCT-ID TO RESTOCK: ".
-               ACCEPT WS-INPUT-PRODUCT-ID.
+                MULTIPLY PRODUCT-PRICE(WS-INDEX)BY WS-INPUT-QUANTITY
+                     GIVING WS-TOTAL-PRICE
 
-               DISPLAY "ENTER QUANTITY TO ADD: ".
-               ACCEPT WS-INPUT-QUANTITY.
+                 MOVE WS-TOTAL-PRICE TO DISPLAY-PRICE
 
-               PERFORM VARYING WS-INDEX FROM 1 BY 1 UNTIL
-                   WS-INDEX > 100
-                   OR WS-FOUND = "Y"
-                   IF PRODUCT-ID(WS-INDEX) = WS-INPUT-PRODUCT-ID
-                       MOVE "Y" TO WS-FOUND
-                           ADD WS-INPUT-QUANTITY
-                           TO PRODUCT-STOCK(WS-INDEX)
+                 DISPLAY "SALE SUCCESSFUL."
+                 DISPLAY "TOTAL PRICE: " DISPLAY-PRICE
 
-                       MOVE PRODUCT-STOCK(WS-INDEX) TO DISPLAY-STOCK
-                       MOVE PRODUCT-STOCK(WS-INDEX) TO DISPLAY-STOCK
+               MOVE "Y" TO WS-COMPLETE
 
-                       DISPLAY "RESTOCK SUCCESFUL. NEW QUANTITY: "
-                       DISPLAY-STOCK
-                   END-IF
-               END-PERFORM.
+               ELSE
+                   DISPLAY "ERROR : NOT ENOUGH STOCK AVAILABLE: "
+                       PRODUCT-STOCK(WS-INDEX)
+                   DISPLAY "PLEASE TRY AGAIN."
+               END-IF
+           END-IF
 
-               IF WS-FOUND = "N"
-                   DISPLAY "ERROR : PRODUCT ID NOT FOUND."
-               END-IF.
+       END-PERFORM
+
+
 
                DISPLAY " "
                DISPLAY "PRESS ENTER TO RETURN TO MAIN MENU..."
                ACCEPT WS-DUMMY.
+
+                               RESTOCK-ITEM.
+        MOVE "N" TO WS-FOUND.
+
+         PERFORM UNTIL WS-COMPLETE = "Y"
+        DISPLAY "ENTER PRODUCT-ID TO RESTOCK: "
+        ACCEPT WS-INPUT-PRODUCT-ID
+
+        DISPLAY "ENTER QUANTITY TO RESTOCK: "
+        ACCEPT WS-INPUT-QUANTITY
+
+        MOVE "N" TO WS-FOUND
+
+        PERFORM VARYING WS-INDEX FROM 1 BY 1 UNTIL
+            WS-INDEX > 100 OR WS-FOUND = "Y"
+            IF PRODUCT-ID(WS-INDEX) = WS-INPUT-PRODUCT-ID
+                MOVE "Y" TO WS-FOUND
+            END-IF
+        END-PERFORM
+
+        IF WS-FOUND = "N"
+            DISPLAY "ERROR : PRODUCT ID NOT FOUND. PLEASE TRY AGAIN."
+        ELSE
+            SUBTRACT 1 FROM WS-INDEX
+            ADD WS-INPUT-QUANTITY TO PRODUCT-STOCK(WS-INDEX)
+            MULTIPLY PRODUCT-PRICE(WS-INDEX) BY WS-INPUT-QUANTITY
+            GIVING WS-TOTAL-PRICE
+            MOVE WS-TOTAL-PRICE TO DISPLAY-PRICE
+
+            DISPLAY "RESTOCK SUCCESSFUL."
+            DISPLAY "TOTAL PRICE: " DISPLAY-PRICE
+
+            MOVE "Y" TO WS-COMPLETE
+        END-IF
+       END-PERFORM
+
+       DISPLAY " "
+       DISPLAY "PRESS ENTER TO RETURN TO MAIN MENU..."
+       ACCEPT WS-DUMMY.
+
 
            PRINT-INVENTORY-REPORT.
                MOVE "N" TO WS-FOUND.
@@ -245,6 +297,11 @@
 
                        ADD WS-ITEM-VALUE TO WS-ALL-PRICE
 
+                       IF PRODUCT-STOCK(WS-INDEX) < 10
+                           MOVE "*" TO DISPLAY-STAR
+                       END-IF
+
+
                        MOVE PRODUCT-ID(WS-INDEX) TO DISPLAY-PRODUCT-ID
                        MOVE PRODUCT-NAME(WS-INDEX) TO DISPLAY-NAME
                        MOVE PRODUCT-STOCK(WS-INDEX) TO DISPLAY-STOCK
@@ -257,13 +314,15 @@
                                CATEGORY(WS-INDEX) "  | "
                                DISPLAY-STOCK "     |"
                                DISPLAY-PRICE "| "
-                               DISPLAY-VALUE
+                               DISPLAY-VALUE DISPLAY-STAR
+
+                       MOVE " " TO DISPLAY-STAR
                    END-IF
 
-                   
+
                END-PERFORM.
-               DISPLAY "TOTAL INVENTORY: " DISPLAY-ALL
-               
+
+
                DISPLAY " ".
                DISPLAY "PRESS ENTER TO RETURN TO MAIN MENU...".
                ACCEPT WS-DUMMY.
