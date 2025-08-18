@@ -33,6 +33,13 @@
            10 PRODUCT-PRICE    PIC 9(5)V99.
            10 PRODUCT-STOCK    PIC 9(5).
 
+       01 DISPLAY-GROUP.
+           05 DISPLAY-PRODUCT-ID PIC X(7).
+           05 DISPLAY-NAME PIC X(30).
+           05 DISPLAY-PRICE PIC Z,ZZZ,ZZZ.99.
+           05 DISPLAY-STOCK PIC ZZ.
+           05 DISPLAY-VALUE PIC Z,ZZZ,ZZZ.99.
+
        PROCEDURE DIVISION.
 
            MAIN-PROGRAM.
@@ -134,7 +141,9 @@
                            MULTIPLY PRODUCT-PRICE(WS-INDEX) BY
                                WS-INPUT-QUANTITY GIVING WS-TOTAL-PRICE
                            DISPLAY "SALE SUCCESSFUL."
-                           DISPLAY "TOTAL PRICE: " WS-TOTAL-PRICE
+
+                           MOVE WS-TOTAL-PRICE TO DISPLAY-PRICE
+                           DISPLAY "TOTAL PRICE: " DISPLAY-PRICE
                        ELSE
                            DISPLAY "ERROR : NOT ENOUGH STOCK AVAILABLE:"
                            PRODUCT-STOCK(WS-INDEX)
@@ -165,6 +174,8 @@
                        MOVE "Y" TO WS-FOUND
                            ADD WS-INPUT-QUANTITY
                            TO PRODUCT-STOCK(WS-INDEX)
+                           
+                       MOVE PRODUCT-STOCK(WS-INDEX) TO DISPLAY-STOCK
 
                        DISPLAY "RESTOCK SUCCESFUL. NEW QUANTITY: "
                        PRODUCT-STOCK(WS-INDEX)
@@ -180,29 +191,39 @@
                ACCEPT WS-DUMMY.
 
            PRINT-INVENTORY-REPORT.
+
                DISPLAY "=== PRINT INVENTORY REPORT MENU ===".
                DISPLAY " ".
                DISPLAY "ID      | PRODUCT NAME                   | CAT "
-               "| STOCK | PRICE   | TOTAL VALUE".
+               "| STOCK     | PRICE      | TOTAL VALUE".
                DISPLAY "--------|--------------------------------|-----"
-               "|-------|---------|------------".
+               "|-----------|------------|-------------".
 
                PERFORM VARYING WS-INDEX FROM 1 BY 1 UNTIL WS-INDEX > 10
                    IF PRODUCT-ID(WS-INDEX) NOT = SPACES
-                       MULTIPLY PRODUCT-STOCK(WS-INDEX) BY
-                           PRODUCT-PRICE(WS-INDEX) GIVING WS-ITEM-VALUE
-                       DISPLAY PRODUCT-ID(WS-INDEX) " | "
-                           PRODUCT-NAME(WS-INDEX) " | "
-                           CATEGORY(WS-INDEX) "  | "
-                           PRODUCT-STOCK(WS-INDEX) "   | "
-                           PRODUCT-PRICE(WS-INDEX) " | "
-                           WS-ITEM-VALUE
+                       MULTIPLY PRODUCT-STOCK(WS-INDEX)
+                           BY PRODUCT-PRICE(WS-INDEX)
+                           GIVING WS-ITEM-VALUE
+
+                       MOVE PRODUCT-ID(WS-INDEX) TO DISPLAY-PRODUCT-ID
+                       MOVE PRODUCT-NAME(WS-INDEX) TO DISPLAY-NAME
+                       MOVE PRODUCT-STOCK(WS-INDEX) TO DISPLAY-STOCK
+                       MOVE PRODUCT-PRICE(WS-INDEX) TO DISPLAY-PRICE
+                       MOVE WS-ITEM-VALUE TO DISPLAY-VALUE
+
+                       DISPLAY DISPLAY-PRODUCT-ID " | "
+                               DISPLAY-NAME " | "
+                               CATEGORY(WS-INDEX) "  | "
+                               DISPLAY-STOCK " | "
+                               DISPLAY-PRICE " | "
+                               DISPLAY-VALUE
                    END-IF
                END-PERFORM.
 
                DISPLAY " ".
-               DISPLAY "PRESS ENTER TO RETURN TO MAIN MENU..."
+               DISPLAY "PRESS ENTER TO RETURN TO MAIN MENU...".
                ACCEPT WS-DUMMY.
+
 
 
        END PROGRAM MINI_STOCK_MANAGEMENT.
