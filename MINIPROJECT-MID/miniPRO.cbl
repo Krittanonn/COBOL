@@ -17,7 +17,13 @@
        01 WS-INPUT-PRODUCT-ID PIC X(7).
        01 WS-INPUT-QUANTITY PIC 9(5).
        01 WS-TOTAL-PRICE PIC 9(10)V99.
+       01 WS-DATE.
+           05 WS-YEAR     PIC 9(4).
+           05 WS-MONTH    PIC 9(2).
+           05 WS-DAY      PIC 9(2).
 
+       
+       01 WS-MONTH-ABBR PIC XXX.
        01 WS-FOUND PIC X VALUE "N".
        01 WS-INDEX PIC 9(4) VALUE 1.
        01 WS-ITEM-VALUE PIC 9(10)99V.
@@ -92,6 +98,25 @@
                MOVE "Database Design " TO PRODUCT-NAME(10)
                MOVE 12 TO PRODUCT-STOCK(10)
                MOVE 1800.25 TO PRODUCT-PRICE(10)
+               
+               DISPLAY "ENTER DATE (YYYYMMDD): "
+               ACCEPT WS-DATE.
+               
+               EVALUATE WS-MONTH
+                   WHEN 1  MOVE "JAN" TO WS-MONTH-ABBR
+                   WHEN 2  MOVE "FEB" TO WS-MONTH-ABBR
+                   WHEN 3  MOVE "MAR" TO WS-MONTH-ABBR
+                   WHEN 4  MOVE "APR" TO WS-MONTH-ABBR
+                   WHEN 5  MOVE "MAY" TO WS-MONTH-ABBR
+                   WHEN 6  MOVE "JUN" TO WS-MONTH-ABBR
+                   WHEN 7  MOVE "JUL" TO WS-MONTH-ABBR
+                   WHEN 8  MOVE "AUG" TO WS-MONTH-ABBR
+                   WHEN 9  MOVE "SEP" TO WS-MONTH-ABBR
+                   WHEN 10 MOVE "OCT" TO WS-MONTH-ABBR
+                   WHEN 11 MOVE "NOV" TO WS-MONTH-ABBR
+                   WHEN 12 MOVE "DEC" TO WS-MONTH-ABBR
+               END-EVALUATE.
+
 
                PERFORM UNTIL WS-EXIT = "Y"
                    DISPLAY "=== MAIN MENU ==="
@@ -123,6 +148,7 @@
            SELL-ITEM.
                MOVE "N" TO WS-FOUND.
 
+               
                DISPLAY "=== SELL ITEM MENU ===".
                DISPLAY "ENTER PRODUCT-ID TO SELL: ".
                ACCEPT WS-INPUT-PRODUCT-ID.
@@ -143,6 +169,7 @@
                            DISPLAY "SALE SUCCESSFUL."
 
                            MOVE WS-TOTAL-PRICE TO DISPLAY-PRICE
+                           
                            DISPLAY "TOTAL PRICE: " DISPLAY-PRICE
                        ELSE
                            DISPLAY "ERROR : NOT ENOUGH STOCK AVAILABLE:"
@@ -160,6 +187,8 @@
                ACCEPT WS-DUMMY.
 
            RESTOCK-ITEM.
+               MOVE "N" TO WS-FOUND.
+               
                DISPLAY "=== RESTOCK ITEM MENU ===".
                DISPLAY "ENTER PRODUCT-ID TO RESTOCK: ".
                ACCEPT WS-INPUT-PRODUCT-ID.
@@ -174,11 +203,12 @@
                        MOVE "Y" TO WS-FOUND
                            ADD WS-INPUT-QUANTITY
                            TO PRODUCT-STOCK(WS-INDEX)
-                           
-                       MOVE PRODUCT-STOCK(WS-INDEX) TO DISPLAY-STOCK
 
+                       MOVE PRODUCT-STOCK(WS-INDEX) TO DISPLAY-STOCK
+                       MOVE PRODUCT-STOCK(WS-INDEX) TO DISPLAY-STOCK
+                        
                        DISPLAY "RESTOCK SUCCESFUL. NEW QUANTITY: "
-                       PRODUCT-STOCK(WS-INDEX)
+                       DISPLAY-STOCK
                    END-IF
                END-PERFORM.
 
@@ -191,6 +221,10 @@
                ACCEPT WS-DUMMY.
 
            PRINT-INVENTORY-REPORT.
+               MOVE "N" TO WS-FOUND.
+               
+               DISPLAY "DATE ENTERED: " WS-YEAR "/" WS-MONTH-ABBR "/"
+               WS-DAY.
 
                DISPLAY "=== PRINT INVENTORY REPORT MENU ===".
                DISPLAY " ".
