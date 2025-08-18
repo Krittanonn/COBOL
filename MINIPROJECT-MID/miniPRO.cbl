@@ -22,11 +22,12 @@
            05 WS-MONTH    PIC 9(2).
            05 WS-DAY      PIC 9(2).
 
-       
+
        01 WS-MONTH-ABBR PIC XXX.
        01 WS-FOUND PIC X VALUE "N".
        01 WS-INDEX PIC 9(4) VALUE 1.
        01 WS-ITEM-VALUE PIC 9(10)99V.
+       01 WS-ALL-PRICE PIC 9(20)99V.
 
        01 PRODUCT-TABLE.
            05 PRODUCT-ENTRY OCCURS 100 TIMES.
@@ -43,8 +44,9 @@
            05 DISPLAY-PRODUCT-ID PIC X(7).
            05 DISPLAY-NAME PIC X(30).
            05 DISPLAY-PRICE PIC Z,ZZZ,ZZZ.99.
-           05 DISPLAY-STOCK PIC ZZ.
+           05 DISPLAY-STOCK PIC ZZZZZ.
            05 DISPLAY-VALUE PIC Z,ZZZ,ZZZ.99.
+           05 DISPLAY-ALL PIC Z,ZZZ,ZZZ.99.
 
        PROCEDURE DIVISION.
 
@@ -98,10 +100,10 @@
                MOVE "Database Design " TO PRODUCT-NAME(10)
                MOVE 12 TO PRODUCT-STOCK(10)
                MOVE 1800.25 TO PRODUCT-PRICE(10)
-               
+
                DISPLAY "ENTER DATE (YYYYMMDD): "
                ACCEPT WS-DATE.
-               
+
                EVALUATE WS-MONTH
                    WHEN 1  MOVE "JAN" TO WS-MONTH-ABBR
                    WHEN 2  MOVE "FEB" TO WS-MONTH-ABBR
@@ -148,7 +150,7 @@
            SELL-ITEM.
                MOVE "N" TO WS-FOUND.
 
-               
+
                DISPLAY "=== SELL ITEM MENU ===".
                DISPLAY "ENTER PRODUCT-ID TO SELL: ".
                ACCEPT WS-INPUT-PRODUCT-ID.
@@ -169,7 +171,7 @@
                            DISPLAY "SALE SUCCESSFUL."
 
                            MOVE WS-TOTAL-PRICE TO DISPLAY-PRICE
-                           
+
                            DISPLAY "TOTAL PRICE: " DISPLAY-PRICE
                        ELSE
                            DISPLAY "ERROR : NOT ENOUGH STOCK AVAILABLE:"
@@ -188,7 +190,7 @@
 
            RESTOCK-ITEM.
                MOVE "N" TO WS-FOUND.
-               
+
                DISPLAY "=== RESTOCK ITEM MENU ===".
                DISPLAY "ENTER PRODUCT-ID TO RESTOCK: ".
                ACCEPT WS-INPUT-PRODUCT-ID.
@@ -206,7 +208,7 @@
 
                        MOVE PRODUCT-STOCK(WS-INDEX) TO DISPLAY-STOCK
                        MOVE PRODUCT-STOCK(WS-INDEX) TO DISPLAY-STOCK
-                        
+
                        DISPLAY "RESTOCK SUCCESFUL. NEW QUANTITY: "
                        DISPLAY-STOCK
                    END-IF
@@ -222,9 +224,9 @@
 
            PRINT-INVENTORY-REPORT.
                MOVE "N" TO WS-FOUND.
-               
-               DISPLAY "DATE ENTERED: " WS-YEAR "/" WS-MONTH-ABBR "/"
-               WS-DAY.
+
+               DISPLAY "DATE ENTERED: " WS-DAY "/" WS-MONTH-ABBR "/"
+               WS-YEAR.
 
                DISPLAY "=== PRINT INVENTORY REPORT MENU ===".
                DISPLAY " ".
@@ -233,27 +235,35 @@
                DISPLAY "--------|--------------------------------|-----"
                "|-----------|------------|-------------".
 
+
+
                PERFORM VARYING WS-INDEX FROM 1 BY 1 UNTIL WS-INDEX > 10
                    IF PRODUCT-ID(WS-INDEX) NOT = SPACES
                        MULTIPLY PRODUCT-STOCK(WS-INDEX)
                            BY PRODUCT-PRICE(WS-INDEX)
                            GIVING WS-ITEM-VALUE
 
+                       ADD WS-ITEM-VALUE TO WS-ALL-PRICE
+
                        MOVE PRODUCT-ID(WS-INDEX) TO DISPLAY-PRODUCT-ID
                        MOVE PRODUCT-NAME(WS-INDEX) TO DISPLAY-NAME
                        MOVE PRODUCT-STOCK(WS-INDEX) TO DISPLAY-STOCK
                        MOVE PRODUCT-PRICE(WS-INDEX) TO DISPLAY-PRICE
                        MOVE WS-ITEM-VALUE TO DISPLAY-VALUE
+                       MOVE WS-ALL-PRICE TO DISPLAY-ALL
 
                        DISPLAY DISPLAY-PRODUCT-ID " | "
                                DISPLAY-NAME " | "
                                CATEGORY(WS-INDEX) "  | "
-                               DISPLAY-STOCK " | "
-                               DISPLAY-PRICE " | "
+                               DISPLAY-STOCK "     |"
+                               DISPLAY-PRICE "| "
                                DISPLAY-VALUE
                    END-IF
-               END-PERFORM.
 
+                   
+               END-PERFORM.
+               DISPLAY "TOTAL INVENTORY: " DISPLAY-ALL
+               
                DISPLAY " ".
                DISPLAY "PRESS ENTER TO RETURN TO MAIN MENU...".
                ACCEPT WS-DUMMY.
