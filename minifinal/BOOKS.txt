@@ -1,0 +1,10 @@
+9780131103627The C Programming Language                                  AVAILABLE 
+9780201633610Design Patterns                                             AVAILABLE 
+9780132350884Clean Code                                                  OUT       
+9780596009205Head First Design Patterns                                  AVAILABLE 
+9780321125217Effective C++                                               AVAILABLE 
+9780201835953The Mythical Man Month                                      OUT       
+9780135957059The Pragmatic Programmer                                    AVAILABLE 
+9780596007126Head First Java                                             AVAILABLE 
+9780321356680Effective Java                                              OUT       
+9780596516178JavaScript The Good Parts                                   AVAILABLE
