@@ -92,6 +92,7 @@
            DISPLAY "=== LIBRARY MANAGEMENT SYSTEM ===".
            PERFORM OPEN-FILES.
            PERFORM UNTIL WS-OPTION = 9
+               MOVE 0 TO WS-OPTION
                PERFORM DISPLAY-MAIN-MENU
                PERFORM HANDLE-MENU-OPTION
            END-PERFORM.
@@ -166,13 +167,13 @@
 
        REGISTER-MEMBER.
            DISPLAY "== Register Member ==".
-           DISPLAY "Enter Member ID: " WITH NO ADVANCING
+           DISPLAY "Enter Member ID: "
            ACCEPT MEMBER-ID-KEY
            READ MEMBER-FILE KEY IS MEMBER-ID-KEY
               INVALID KEY
-                 DISPLAY "Name: " WITH NO ADVANCING
+                 DISPLAY "Name: "
                  ACCEPT MEMBER-NAME
-                 DISPLAY "Password: " WITH NO ADVANCING
+                 DISPLAY "Password: "
                  ACCEPT MEMBER-PASSWORD
                  MOVE "ACTIVE" TO MEMBER-STATUS
                  WRITE MEMBER-RECORD
@@ -182,9 +183,9 @@
 
        LOGIN-PROMPT.
            DISPLAY "== Login ==".
-           DISPLAY "Member ID: " WITH NO ADVANCING
+           DISPLAY "Member ID: "
            ACCEPT WS-USER-ID
-           DISPLAY "Password: " WITH NO ADVANCING
+           DISPLAY "Password: "
            ACCEPT WS-PASS
            MOVE WS-USER-ID TO MEMBER-ID-KEY
            READ MEMBER-FILE KEY IS MEMBER-ID-KEY
@@ -204,7 +205,7 @@
            DISPLAY "2. Update Book Status".
            DISPLAY "3. Show Book".
            DISPLAY "4. Back".
-           DISPLAY "Select option (1-4): " WITH NO ADVANCING
+           DISPLAY "Select option (1-4): "
            ACCEPT WS-OPTION
            EVALUATE WS-OPTION
              WHEN 1 PERFORM ADD-BOOK
@@ -214,15 +215,15 @@
            END-EVALUATE.
 
        ADD-BOOK.
-           DISPLAY "Enter ISBN: " WITH NO ADVANCING
+           DISPLAY "Enter ISBN: "
            ACCEPT BOOK-ISBN-KEY
-           DISPLAY "Enter Title: " WITH NO ADVANCING
+           DISPLAY "Enter Title: "
            ACCEPT BOOK-TITLE
-           DISPLAY "Enter Author: " WITH NO ADVANCING
+           DISPLAY "Enter Author: "
            ACCEPT BOOK-AUTHOR
-           DISPLAY "Enter Publisher: " WITH NO ADVANCING
+           DISPLAY "Enter Publisher: "
            ACCEPT BOOK-PUBLISHER
-           DISPLAY "Enter Year: " WITH NO ADVANCING
+           DISPLAY "Enter Year: "
            ACCEPT BOOK-YEAR
            MOVE "AVAILABLE" TO BOOK-STATUS
            WRITE BOOK-RECORD INVALID KEY
@@ -230,18 +231,18 @@
            END-WRITE.
 
        UPDATE-BOOK-STATUS.
-           DISPLAY "Enter ISBN: " WITH NO ADVANCING
+           DISPLAY "Enter ISBN: "
            ACCEPT BOOK-ISBN-KEY
            READ BOOK-FILE KEY IS BOOK-ISBN-KEY
               INVALID KEY DISPLAY "Book not found."
               NOT INVALID KEY
-                 DISPLAY "New Status: " WITH NO ADVANCING
+                 DISPLAY "New Status: "
                  ACCEPT BOOK-STATUS
                  REWRITE BOOK-RECORD
            END-READ.
 
        SHOW-BOOK.
-           DISPLAY "Enter ISBN: " WITH NO ADVANCING
+           DISPLAY "Enter ISBN: "
            ACCEPT BOOK-ISBN-KEY
            READ BOOK-FILE KEY IS BOOK-ISBN-KEY
               INVALID KEY DISPLAY "Book not found."
@@ -253,9 +254,9 @@
 
 
        BORROW-BOOK.
-           DISPLAY "Enter Member ID: " WITH NO ADVANCING
+           DISPLAY "Enter Member ID: "
            ACCEPT LOAN-MEMBER-ID
-           DISPLAY "Enter ISBN: " WITH NO ADVANCING
+           DISPLAY "Enter ISBN: "
            ACCEPT LOAN-ISBN
            READ BOOK-FILE KEY IS LOAN-ISBN
               INVALID KEY DISPLAY "Book not found."
@@ -273,7 +274,7 @@
            END-READ.
 
        RETURN-BOOK.
-           DISPLAY "Enter Loan ID: " WITH NO ADVANCING
+           DISPLAY "Enter Loan ID: "
            ACCEPT LOAN-ID-KEY
            READ LOAN-FILE KEY IS LOAN-ID-KEY
               INVALID KEY DISPLAY "Loan not found."
@@ -285,7 +286,7 @@
            END-READ.
 
        RENEW-LOAN.
-           DISPLAY "Enter Loan ID: " WITH NO ADVANCING
+           DISPLAY "Enter Loan ID: "
            ACCEPT LOAN-ID-KEY
            READ LOAN-FILE KEY IS LOAN-ID-KEY
               INVALID KEY DISPLAY "Loan not found."
@@ -300,7 +301,7 @@
            END-READ.
 
        SEARCH-BOOK.
-           DISPLAY "Enter ISBN to search: " WITH NO ADVANCING
+           DISPLAY "Enter ISBN to search: "
            ACCEPT BOOK-ISBN-KEY
            READ BOOK-FILE KEY IS BOOK-ISBN-KEY
               INVALID KEY DISPLAY "Book not found."
@@ -338,7 +339,7 @@
            DISPLAY "2. All Loans".
            DISPLAY "3. All Fines".
            DISPLAY "4. Back".
-           DISPLAY "Select report (1-4): " WITH NO ADVANCING
+           DISPLAY "Select report (1-4): "
            ACCEPT WS-OPTION
            EVALUATE WS-OPTION
              WHEN 1 PERFORM REPORT-ALL-BOOKS
